@@ -1,12 +1,11 @@
 from sys import argv
 
-from scanner import Scanner
-from token import Token
+import scanner as scan
 
 had_error : bool = False
 
 def run(source : str) -> None:
-    scanner = Scanner()
+    scanner = scan.Scanner(source)
     tokens = scanner.scan_tokens()
 
     for token in tokens:
@@ -34,6 +33,7 @@ def run_prompt() -> None:
         try:
             line = input("> ")
         except (EOFError, KeyboardInterrupt):
+            print()
             break
 
         run(line)
