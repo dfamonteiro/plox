@@ -13,6 +13,12 @@ def defineAst(output_dir : str, base_name : str, types : List[str]):
                 "",
                 "from token import Token",
                 "",
+            ])
+        )
+        f.write(gen_visitor(base_name, types))
+        
+        f.write("\n".join(
+            [
                 f"class {base_name}:",
                 INDENT + f"def accept(self, visitor : {base_name}Visitor):",
                 INDENT * 2 + "raise NotImplementedError()",
@@ -22,8 +28,7 @@ def defineAst(output_dir : str, base_name : str, types : List[str]):
 
         for i in types:
             f.write(gen_class(base_name, i))
-
-        f.write(gen_visitor(base_name, types))
+            
 
 def gen_class(base_name : str, production : str) -> str:
 
@@ -60,7 +65,7 @@ def gen_class(base_name : str, production : str) -> str:
     code.extend(
             [
                 INDENT + f"def accept(self, visitor : {base_name}Visitor):",
-                INDENT * 2 + f"return visitor.visit_{class_name.lower()}_{base_name.lower()}(self):"
+                INDENT * 2 + f"return visitor.visit_{class_name.lower()}_{base_name.lower()}(self)"
             ]
         )
 
@@ -77,7 +82,7 @@ def gen_visitor(base_name : str, productions : List[str]) -> str:
         
         code.append(
             INDENT  + 
-            f"def visit_{class_name.lower()}_{base_name.lower()}(self, {base_name.lower()} : {class_name}):"
+            f"def visit_{class_name.lower()}_{base_name.lower()}(self, {base_name.lower()}):"
         )
         code.append(INDENT * 2 + "raise NotImplementedError()")
     

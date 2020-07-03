@@ -2,6 +2,17 @@
 
 from token import Token
 
+class ExprVisitor:
+    def visit_binary_expr(self, expr):
+        raise NotImplementedError()
+    def visit_grouping_expr(self, expr):
+        raise NotImplementedError()
+    def visit_literal_expr(self, expr):
+        raise NotImplementedError()
+    def visit_unary_expr(self, expr):
+        raise NotImplementedError()
+
+
 class Expr:
     def accept(self, visitor : ExprVisitor):
         raise NotImplementedError()
@@ -17,7 +28,7 @@ class Binary(Expr):
         self.right = right
 
     def accept(self, visitor : ExprVisitor):
-        return visitor.visit_binary_expr(self):
+        return visitor.visit_binary_expr(self)
 
 
 class Grouping(Expr):
@@ -27,7 +38,7 @@ class Grouping(Expr):
         self.expression = expression
 
     def accept(self, visitor : ExprVisitor):
-        return visitor.visit_grouping_expr(self):
+        return visitor.visit_grouping_expr(self)
 
 
 class Literal(Expr):
@@ -37,7 +48,7 @@ class Literal(Expr):
         self.value = value
 
     def accept(self, visitor : ExprVisitor):
-        return visitor.visit_literal_expr(self):
+        return visitor.visit_literal_expr(self)
 
 
 class Unary(Expr):
@@ -49,18 +60,6 @@ class Unary(Expr):
         self.right = right
 
     def accept(self, visitor : ExprVisitor):
-        return visitor.visit_unary_expr(self):
-
-
-
-class ExprVisitor:
-    def visit_binary_expr(self, expr : Binary):
-        raise NotImplementedError()
-    def visit_grouping_expr(self, expr : Grouping):
-        raise NotImplementedError()
-    def visit_literal_expr(self, expr : Literal):
-        raise NotImplementedError()
-    def visit_unary_expr(self, expr : Unary):
-        raise NotImplementedError()
+        return visitor.visit_unary_expr(self)
 
 
