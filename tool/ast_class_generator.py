@@ -1,6 +1,8 @@
 from typing import List
 from pathlib import Path
 
+INDENT = " " * 4
+
 def defineAst(output_dir : str, base_name : str, types : List[str]):
     target = Path(output_dir) / Path(base_name.lower() + ".py")
 
@@ -12,44 +14,75 @@ def defineAst(output_dir : str, base_name : str, types : List[str]):
                 "from token import Token",
                 "",
                 f"class {base_name}:",
-                ""
+                INDENT + f"def accept(self, visitor : {base_name}Visitor):",
+                INDENT * 2 + "raise NotImplementedError()",
+                "\n"
             ])
         )
 
         for i in types:
-
             f.write(gen_class(base_name, i))
 
+        f.write(gen_visitor(base_name, types))
+
 def gen_class(base_name : str, production : str) -> str:
-    INDENT = " " * 4
 
     class_name, fields_str = map(lambda s: s.strip(), production.split(":"))
 
     fields = list(map(lambda s: s.strip().split(), fields_str.split(",")))
 
-    code = [INDENT + f"class {class_name}({base_name}):"]
+    for i in range(len(fields)):
+        if fields[i][0] == "Object":
+            fields[i][0] = "object"
+
+    code = [ f"class {class_name}({base_name}):"]
 
     for _type, name in fields:
         code.append(
-            INDENT * 2 + f"{name} : {_type}"
+            INDENT  + f"{name} : {_type}"
         )
     
     code.append("")
 
     init_params = ', '.join([name + ' : ' + _type for _type, name in fields])
 
-    init = INDENT * 2 + f"def __init__(self, {init_params}):"
+    init = INDENT  + f"def __init__(self, {init_params}):"
 
     code.append(init)
 
     for _type, name in fields:
         code.append(
-            INDENT * 3 + f"self.{name} = {name}"
+            INDENT * 2 + f"self.{name} = {name}"
+        )
+    
+    code.append("")
+
+    code.extend(
+            [
+                INDENT + f"def accept(self, visitor : {base_name}Visitor):",
+                INDENT * 2 + f"return visitor.visit_{class_name.lower()}_{base_name.lower()}(self):"
+            ]
         )
 
     code.append("\n\n")
     return "\n".join(code)
 
+def gen_visitor(base_name : str, productions : List[str]) -> str:
+    INDENT = " " * 4
+
+    code = ["", f"class {base_name}Visitor:"]
+
+    for prod in productions:
+        class_name, fields_str = map(lambda s: s.strip(), prod.split(":"))
+        
+        code.append(
+            INDENT  + 
+            f"def visit_{class_name.lower()}_{base_name.lower()}(self, {base_name.lower()} : {class_name}):"
+        )
+        code.append(INDENT * 2 + "raise NotImplementedError()")
+    
+    code.append("\n\n")
+    return "\n".join(code)
 
 if __name__ == "__main__":
     defineAst(".", "Expr", 
