@@ -3,6 +3,25 @@ from typing import List
 from token import Token, TokenType
 import lox
 
+KEYWORDS = {
+    "and"    : TokenType.AND,
+    "class"  : TokenType.CLASS,
+    "else"   : TokenType.ELSE,
+    "false"  : TokenType.FALSE,
+    "for"    : TokenType.FOR,
+    "fun"    : TokenType.FUN,
+    "if"     : TokenType.IF,
+    "nil"    : TokenType.NIL,
+    "or"     : TokenType.OR,
+    "print"  : TokenType.PRINT,
+    "return" : TokenType.RETURN,
+    "super"  : TokenType.SUPER,
+    "this"   : TokenType.THIS,
+    "true"   : TokenType.TRUE,
+    "var"    : TokenType.VAR,
+    "while"  : TokenType.WHILE
+}
+
 class Scanner:
     source  : str
     tokens  : List[Token]
@@ -91,6 +110,8 @@ class Scanner:
         
         elif char.isdigit():
             self.number()
+        elif self.is_alpha(char):
+            self.identifier()
 
         else:
             lox.error(self.line, "Unexpected character")
@@ -156,3 +177,21 @@ class Scanner:
             TokenType.NUMBER,
             float(self.source[self.start : self.current])
         )
+    
+    # Can't use isalpha because it needs to include underscores
+    def is_alpha(self, char : str) -> bool:
+        return char.isalpha() or char == "_"
+    
+    def is_alphanumeric(self, char : str) -> bool:
+        return char.isalnum() or char == "_"
+
+    def identifier(self):
+        while self.is_alphanumeric(self.peek()):
+            self.advance()
+
+        text = self.source[self.start : self.current]
+
+        if text in KEYWORDS:
+            self.add_token(KEYWORDS[text])
+        else:
+            self.add_token(TokenType.IDENTIFIER)
