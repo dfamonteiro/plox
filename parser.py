@@ -3,6 +3,7 @@ from typing import List
 import Token
 import expr
 import lox
+import stmt
 
 class ParseError(Exception):
     pass
@@ -16,10 +17,27 @@ class Parser:
         self.current = 0
     
     def parse(self):
-        try:
-            return self.expression()
-        except ParseError:
-            return None
+        statements = []
+        while not self.is_at_end():
+            statements.append(self.statement())
+        
+        return statements
+    
+    def statement(self) -> stmt.Stmt:
+        if self.match(Token.TokenType.PRINT):
+            return self.print_statement()
+        else:
+            return self.expression_statement()
+
+    def print_statement(self) -> stmt.Stmt:
+        value = self.expression()
+        self.consume(Token.TokenType.SEMICOLON, "Expect ';' after value.")
+        return stmt.Print(value)
+    
+    def expression_statement(self) -> stmt.Stmt:
+        expr = self.expression()
+        self.consume(Token.TokenType.SEMICOLON, "Expect ';' after print.")
+        return stmt.Expression(expr)
     
     def expression(self) -> expr.Expr:
         return self.equality()
