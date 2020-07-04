@@ -1,5 +1,5 @@
 import expr
-import token
+import Token
 import lox
 
 class RuntimeError(Exception):
@@ -27,11 +27,11 @@ class Interpreter(expr.ExprVisitor):
 
         _type = expr.operator.token_type
 
-        if _type == token.TokenType.MINUS:
+        if _type == Token.TokenType.MINUS:
             self.check_number_operands(expr.operator, left, right)
             return float(left) - float(right)
 
-        if _type == token.TokenType.PLUS:
+        if _type == Token.TokenType.PLUS:
 
             if type(left) == float and type(right) == float:
                 return float(left) + float(right)
@@ -41,35 +41,35 @@ class Interpreter(expr.ExprVisitor):
             
             raise RuntimeError(expr.operator, "Operands must be two numbers or two strings.")
 
-        if _type == token.TokenType.SLASH:
+        if _type == Token.TokenType.SLASH:
             self.check_number_operands(expr.operator, left, right)
             return float(left) / float(right)
 
-        if _type == token.TokenType.STAR:
+        if _type == Token.TokenType.STAR:
             self.check_number_operands(expr.operator, left, right)
             return float(left) * float(right)
 
-        if _type == token.TokenType.GREATER:
+        if _type == Token.TokenType.GREATER:
             self.check_number_operands(expr.operator, left, right)
             return float(left) > float(right)
 
-        if _type == token.TokenType.GREATER_EQUAL:
+        if _type == Token.TokenType.GREATER_EQUAL:
             self.check_number_operands(expr.operator, left, right)
             return float(left) >= float(right)
 
-        if _type == token.TokenType.LESS:
+        if _type == Token.TokenType.LESS:
             self.check_number_operands(expr.operator, left, right)
             return float(left) < float(right)
 
-        if _type == token.TokenType.LESS_EQUAL:
+        if _type == Token.TokenType.LESS_EQUAL:
             self.check_number_operands(expr.operator, left, right)
             return float(left) <= float(right)
         
 
-        if _type == token.TokenType.BANG_EQUAL:
+        if _type == Token.TokenType.BANG_EQUAL:
             return not self.is_equal(left, right)
 
-        if _type == token.TokenType.EQUAL_EQUAL:
+        if _type == Token.TokenType.EQUAL_EQUAL:
             return self.is_equal(left, right)
 
     def visit_grouping_expr(self, expr : expr.Grouping):
@@ -81,10 +81,10 @@ class Interpreter(expr.ExprVisitor):
     def visit_unary_expr(self, expr : expr.Unary):
         right = self.evaluate(expr.right)
 
-        if expr.operator.token_type == token.TokenType.MINUS:
+        if expr.operator.token_type == Token.TokenType.MINUS:
             self.check_number_operand(expr.operator, right)
             return - float(right)
-        elif expr.operator.token_type == token.TokenType.BANG:
+        elif expr.operator.token_type == Token.TokenType.BANG:
             return not self.is_truthy(right)
         
         raise Exception("Unreachable")
@@ -95,10 +95,10 @@ class Interpreter(expr.ExprVisitor):
     def is_equal(self, a, b):
         return a == b
     
-    def check_number_operand(self, operator : token.Token, operand):
+    def check_number_operand(self, operator : Token.Token, operand):
         if type(operand) != float:
             raise RuntimeError(operator, "Operand must be a number.")
     
-    def check_number_operands(self, operator : token.Token, left, right):
+    def check_number_operands(self, operator : Token.Token, left, right):
         if type(left) != float or type(right) != float:
             raise RuntimeError(operator, "Operands must be numbers.")
