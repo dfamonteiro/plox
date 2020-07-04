@@ -1,6 +1,11 @@
-from token import Token, TokenType
 from typing import List
+
+from token import Token, TokenType
 import expr
+import lox
+
+class ParseError(Exception):
+    pass
 
 class Parser:
     tokens : List[Token]
@@ -105,5 +110,33 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return expr.Grouping(expression)
         
-        
-        
+    def consume(self, _type : TokenType, message : str) -> Token:
+        if self.check(_type):
+            return self.advance()
+        else:
+            raise self.error(self.peek(), message)
+
+    def error(self, token : Token, message : str) -> ParseError:
+        lox.error(token, message)
+        return ParseError()
+    
+    def synchronize(self):
+        self.advance()
+
+        while not self.is_at_end():
+            if self.previous().token_type == TokenType.SEMICOLON:
+                return
+            
+            if self.peek().token_type in (
+                TokenType.CLASS,
+                TokenType.FUN,
+                TokenType.VAR,
+                TokenType.FOR,
+                TokenType.IF,
+                TokenType.WHILE,
+                TokenType.PRINT,
+                TokenType.RETURN
+            ):
+                return
+            
+            self.advance()
