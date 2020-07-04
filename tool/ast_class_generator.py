@@ -98,3 +98,10 @@ if __name__ == "__main__":
             "Unary    : Token operator, Expr right"
         ]
     )
+
+    defineAst(".", "Stmt", 
+        [
+            "Expression : Expr expression",
+            "Print      : Expr expression"
+        ]
+    )
