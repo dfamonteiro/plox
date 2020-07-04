@@ -8,6 +8,8 @@ class StmtVisitor:
         raise NotImplementedError()
     def visit_print_stmt(self, stmt):
         raise NotImplementedError()
+    def visit_var_stmt(self, stmt):
+        raise NotImplementedError()
 
 
 class Stmt:
@@ -32,5 +34,17 @@ class Print(Stmt):
 
     def accept(self, visitor : StmtVisitor):
         return visitor.visit_print_stmt(self)
+
+
+class Var(Stmt):
+    name : Token
+    initializer : Expr
+
+    def __init__(self, name : Token, initializer : Expr):
+        self.name = name
+        self.initializer = initializer
+
+    def accept(self, visitor : StmtVisitor):
+        return visitor.visit_var_stmt(self)
 
 

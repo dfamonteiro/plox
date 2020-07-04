@@ -1,23 +1,37 @@
+from typing import List
+
 import expr
 import Token
 import lox
+import stmt
 
 class RuntimeError(Exception):
     def __init__(self, token, message):
         super().__init__(message)
         self.token = token
 
-class Interpreter(expr.ExprVisitor):
+class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
+
+    def visit_expression_stmt(self, stmt):
+        self.evaluate(stmt.expression)
+
+    def visit_print_stmt(self, stmt):
+        value = self.evaluate(stmt.expression)
+        print(self.stringify(value))
+
     def evaluate(self, expression : expr.Expr):
         return expression.accept(self)
     
-    def interpret(self, expression : expr.Expr):
+    def interpret(self, statements : List[stmt.Stmt]):
         try:
-            value = self.evaluate(expression)
-            print(value)
+            for statement in statements:
+                self.execute(statement)
         except RuntimeError as e:
             lox.runtime_error(e)
     
+    def execute(self, statement : stmt.Stmt):
+        statement.accept(self)
+
     def stringify(self, obj) -> str:
         return "nil" if obj == None else str(obj)
     

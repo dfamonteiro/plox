@@ -11,6 +11,8 @@ class ExprVisitor:
         raise NotImplementedError()
     def visit_unary_expr(self, expr):
         raise NotImplementedError()
+    def visit_variable_expr(self, expr):
+        raise NotImplementedError()
 
 
 class Expr:
@@ -61,5 +63,15 @@ class Unary(Expr):
 
     def accept(self, visitor : ExprVisitor):
         return visitor.visit_unary_expr(self)
+
+
+class Variable(Expr):
+    name : Token
+
+    def __init__(self, name : Token):
+        self.name = name
+
+    def accept(self, visitor : ExprVisitor):
+        return visitor.visit_variable_expr(self)
 
 

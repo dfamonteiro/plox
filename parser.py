@@ -36,7 +36,7 @@ class Parser:
     
     def expression_statement(self) -> stmt.Stmt:
         expr = self.expression()
-        self.consume(Token.TokenType.SEMICOLON, "Expect ';' after print.")
+        self.consume(Token.TokenType.SEMICOLON, "Expect ';' after expression.")
         return stmt.Expression(expr)
     
     def expression(self) -> expr.Expr:

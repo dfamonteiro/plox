@@ -90,18 +90,20 @@ def gen_visitor(base_name : str, productions : List[str]) -> str:
     return "\n".join(code)
 
 if __name__ == "__main__":
-    defineAst(".", "Expr", 
+    defineAst(".", "Expr",
         [
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : Object value",
-            "Unary    : Token operator, Expr right"
+            "Unary    : Token operator, Expr right",
+            "Variable : Token name"
         ]
     )
 
-    defineAst(".", "Stmt", 
+    defineAst(".", "Stmt",
         [
             "Expression : Expr expression",
-            "Print      : Expr expression"
+            "Print      : Expr expression",
+            "Var        : Token name, Expr initializer"
         ]
     )
