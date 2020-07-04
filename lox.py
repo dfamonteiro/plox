@@ -1,8 +1,10 @@
 from sys import argv
 from typing import Union
 
-import scanner as scan
 import token
+import scanner as scan
+import parser
+import ast_printer
 
 had_error : bool = False
 
@@ -10,6 +12,13 @@ def run(source : str) -> None:
     scanner = scan.Scanner(source)
     tokens = scanner.scan_tokens()
 
+    _parser = parser.Parser(tokens)
+    expression = _parser.parse()
+
+    if had_error:
+        return
+    else:
+        print(ast_printer.AstPrinter().print_ast(expression))
     for token in tokens:
         print(token)
 
