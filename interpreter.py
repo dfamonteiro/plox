@@ -34,10 +34,10 @@ class Interpreter(expr.ExprVisitor):
         if _type == token.TokenType.PLUS:
 
             if type(left) == float and type(right) == float:
-                return float(left) - float(right)
+                return float(left) + float(right)
 
             if type(left) == str and type(right) == str:
-                return str(left) - str(right)
+                return str(left) + str(right)
             
             raise RuntimeError(expr.operator, "Operands must be two numbers or two strings.")
 

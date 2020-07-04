@@ -9,7 +9,7 @@ import interpreter
 
 had_error : bool = False
 had_runtime_error : bool = False
-
+interprter = interpreter.Interpreter() # The typo is intentional
 
 def run(source : str) -> None:
     scanner = scan.Scanner(source)
@@ -21,9 +21,10 @@ def run(source : str) -> None:
     if had_error:
         return
     else:
-        print(ast_printer.AstPrinter().print_ast(expression))
-    for token in tokens:
-        print(token)
+        #print(ast_printer.AstPrinter().print_ast(expression))
+        interprter.interpret(expression)
+    # for token in tokens:
+    #     print(token)
 
 def run_file(path : str) -> None:
     global had_error 
