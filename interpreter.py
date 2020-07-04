@@ -1,5 +1,6 @@
 import expr
 import token
+import lox
 
 class RuntimeError(Exception):
     def __init__(self, token, message):
@@ -9,6 +10,16 @@ class RuntimeError(Exception):
 class Interpreter(expr.ExprVisitor):
     def evaluate(self, expression : expr.Expr):
         return expression.accept(self)
+    
+    def interpret(self, expression : expr.Expr):
+        try:
+            value = self.evaluate(expression)
+            print(value)
+        except RuntimeError as e:
+            lox.runtime_error(e)
+    
+    def stringify(self, obj) -> str:
+        return "nil" if obj == None else str(obj)
     
     def visit_binary_expr(self, expr : expr.Binary):
         left = self.evaluate(expr.left)
