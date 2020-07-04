@@ -59,7 +59,7 @@ class Parser:
         return self.tokens[self.current]
 
     def previous(self) -> token.Token:
-        return self.tokens[self.current]
+        return self.tokens[self.current - 1]
     
     def comparison(self) -> expr.Expr:
         expression = self.addition()
