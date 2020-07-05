@@ -30,6 +30,12 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
                 self.execute(statement)
         finally:
             self.env = previous
+    
+    def visit_if_stmt(self, statement : stmt.If):
+        if self.is_truthy(self.evaluate(statement.condition)):
+            self.execute(statement.then_branch)
+        elif statement.else_branch != None:
+            self.execute(statement.else_branch)
 
     def visit_expression_stmt(self, stmt):
         self.evaluate(stmt.expression)

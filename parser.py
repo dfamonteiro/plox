@@ -44,6 +44,9 @@ class Parser:
         return stmt.Var(name, initializer)
     
     def statement(self) -> stmt.Stmt:
+        if self.match(Token.TokenType.IF):
+            return self.if_statement()
+
         if self.match(Token.TokenType.PRINT):
             return self.print_statement()
         
@@ -51,6 +54,19 @@ class Parser:
             return stmt.Block(self.block())
 
         return self.expression_statement()
+
+    def if_statement(self) -> stmt.Stmt:
+        self.consume(Token.TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        condition = self.expression()
+        self.consume(Token.TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
+
+        then_branch = self.statement()
+        else_branch = None
+
+        if self.match(Token.TokenType.ELSE):
+            else_branch = self.statement()
+        
+        return stmt.If(condition, then_branch, else_branch)
 
     def block(self) -> List[stmt.Stmt]:
         statements = []
