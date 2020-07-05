@@ -4,6 +4,7 @@ import expr
 import Token
 import lox
 import stmt
+import environment
 
 class RuntimeError(Exception):
     def __init__(self, token, message):
@@ -11,6 +12,10 @@ class RuntimeError(Exception):
         self.token = token
 
 class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
+    env : environment.Environment
+
+    def __init__(self):
+        self.env = environment.Environment()
 
     def visit_expression_stmt(self, stmt):
         self.evaluate(stmt.expression)
@@ -18,6 +23,14 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
     def visit_print_stmt(self, stmt):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
+    
+    def visit_var_stmt(self, stmt):
+        value = None
+
+        if stmt.initializer != None:
+            value = self.evaluate(stmt.initializer)
+
+            self.env.define(stmt.name.lexeme, value)
 
     def evaluate(self, expression : expr.Expr):
         return expression.accept(self)
@@ -102,6 +115,9 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
             return not self.is_truthy(right)
         
         raise Exception("Unreachable")
+
+    def visit_variable_expr(self, expr):
+        return self.env.get(expr.name)
 
     def is_truthy(self, obj) -> bool:
         return obj != None and obj != False
