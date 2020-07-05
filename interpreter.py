@@ -152,7 +152,10 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         if callee is not LoxCallable.LoxCallable:
             raise RuntimeError(expr.paren, "Can only call functions and classes.")
         
-        function = callee
+        function : LoxCallable.LoxCallable = callee
+
+        if len(arguments) != function.arity():
+            raise RuntimeError(expr.paren, f"Expected {function.arity()} arguments but got {len(arguments)}.")
 
         return function.call(self, arguments)
 
