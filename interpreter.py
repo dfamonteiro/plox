@@ -140,6 +140,17 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
 
         if _type == Token.TokenType.EQUAL_EQUAL:
             return self.is_equal(left, right)
+    
+    def visit_call_expr(self, expr):
+        callee = self.evaluate(expr.callee)
+
+        arguments = []
+        for argument in expr.arguments:
+            arguments.append(self.evaluate(argument))
+        
+        function = callee
+
+        return function.call(self, arguments)
 
     def visit_grouping_expr(self, expr : expr.Grouping):
         return self.evaluate(expr.expression)
