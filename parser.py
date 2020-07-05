@@ -50,10 +50,21 @@ class Parser:
         if self.match(Token.TokenType.PRINT):
             return self.print_statement()
         
+        if self.match(Token.TokenType.WHILE):
+            return self.while_statement()
+        
         if self.match(Token.TokenType.LEFT_BRACE):
             return stmt.Block(self.block())
 
         return self.expression_statement()
+
+    def while_statement(self) -> stmt.Stmt:
+        self.consume(Token.TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        condition = self.expression()
+        self.consume(Token.TokenType.RIGHT_PAREN, "Expect ')' after condition.")
+        body = self.statement()
+
+        return stmt.While(condition, body)
 
     def if_statement(self) -> stmt.Stmt:
         self.consume(Token.TokenType.LEFT_PAREN, "Expect '(' after 'if'.")

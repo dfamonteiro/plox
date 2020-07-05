@@ -43,6 +43,10 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         
         return self.evaluate(expression.right)
     
+    def visit_while_stmt(self, stmt : stmt.While):
+        while self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.body)
+    
     def visit_if_stmt(self, statement : stmt.If):
         if self.is_truthy(self.evaluate(statement.condition)):
             self.execute(statement.then_branch)
