@@ -254,7 +254,35 @@ class Parser:
             right = self.unary()
             return expr.Unary(operator, right)
         else:
-            return self.primary()
+            return self.call()
+    
+    def call(self) -> expr.Expr:
+        expression = self.primary()
+
+        while True:
+            if self.match(Token.TokenType.LEFT_PAREN):
+                expression = self.finish_call(expression)
+            else:
+                break
+        
+        return expression
+    
+    def finish_call(self, callee : expr.Expr) -> expr.Expr:
+        arguments = []
+        if not self.check(Token.TokenType.RIGHT_PAREN):
+            while True:
+                if len(arguments) >= 255:
+                    self.error(self.peek(), "Cannot have more than 255 arguments.")
+
+                arguments.append(self.expression())
+                
+                if not self.match(Token.TokenType.COMMA):
+                    break
+        
+        paren = self.consume(Token.TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+
+        return expr.Call(callee, paren, arguments)
+
     
     def primary(self) -> expr.Expr:
         if self.match(Token.TokenType.FALSE):
