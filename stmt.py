@@ -2,8 +2,11 @@
 
 from Token import Token
 from expr import Expr
+from typing import List
 
 class StmtVisitor:
+    def visit_block_stmt(self, stmt):
+        raise NotImplementedError()
     def visit_expression_stmt(self, stmt):
         raise NotImplementedError()
     def visit_print_stmt(self, stmt):
@@ -15,6 +18,16 @@ class StmtVisitor:
 class Stmt:
     def accept(self, visitor : StmtVisitor):
         raise NotImplementedError()
+
+class Block(Stmt):
+    statements : List[Stmt]
+
+    def __init__(self, statements : List[Stmt]):
+        self.statements = statements
+
+    def accept(self, visitor : StmtVisitor):
+        return visitor.visit_block_stmt(self)
+
 
 class Expression(Stmt):
     expression : Expr

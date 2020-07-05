@@ -17,6 +17,20 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
     def __init__(self):
         self.env = environment.Environment()
 
+    def visit_block_stmt(self, statement : stmt.Block):
+        self.execute_block(statement.statements, environment.Environment(self.env))
+
+    def execute_block(self, statements : List[stmt.Stmt], env : environment.Environment):
+        previous = self.env
+
+        try:
+            self.env = env
+
+            for statement in statements:
+                self.execute(statement)
+        finally:
+            self.env = previous
+
     def visit_expression_stmt(self, stmt):
         self.evaluate(stmt.expression)
 

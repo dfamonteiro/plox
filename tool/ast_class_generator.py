@@ -103,6 +103,7 @@ if __name__ == "__main__":
 
     defineAst(".", "Stmt",
         [
+            "Block      : List[Stmt] statements",
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, Expr initializer"
