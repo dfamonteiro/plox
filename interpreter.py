@@ -5,6 +5,7 @@ import Token
 import lox
 import stmt
 import environment
+import LoxCallable
 
 class RuntimeError(Exception):
     def __init__(self, token, message):
@@ -147,6 +148,9 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         arguments = []
         for argument in expr.arguments:
             arguments.append(self.evaluate(argument))
+
+        if callee is not LoxCallable.LoxCallable:
+            raise RuntimeError(expr.paren, "Can only call functions and classes.")
         
         function = callee
 
