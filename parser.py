@@ -89,7 +89,7 @@ class Parser:
         return stmt.Expression(expr)
     
     def assignment(self) -> expr.Expr:
-        expression = self.equality()
+        expression = self._or()
 
         if self.match(Token.TokenType.EQUAL):
             equals = self.previous()
@@ -103,6 +103,25 @@ class Parser:
         
         return expression
 
+    def _or(self) -> expr.Expr:
+        expression = self._and()
+
+        while self.match(Token.TokenType.OR):
+            operator = self.previous()
+            right = self._and()
+            expression = expr.Logical(expression, operator, right)
+
+        return expression
+    
+    def _and(self) -> expr.Expr:
+        expression = self.equality()
+
+        while self.match(Token.TokenType.AND):
+            operator = self.previous()
+            right = self.equality()
+            expression = expr.Logical(expression, operator, right)
+
+        return expression
 
     def expression(self) -> expr.Expr:
         return self.assignment()

@@ -31,6 +31,18 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         finally:
             self.env = previous
     
+    def visit_logical_expr(self, expression : expr.Logical):
+        left = self.evaluate(expression.left)
+
+        if expression.operator.token_type == Token.TokenType.OR:
+            if self.is_truthy(left):
+                return left
+        else:
+            if not self.is_truthy(left):
+                return left
+        
+        return self.evaluate(expression.right)
+    
     def visit_if_stmt(self, statement : stmt.If):
         if self.is_truthy(self.evaluate(statement.condition)):
             self.execute(statement.then_branch)
