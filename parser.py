@@ -25,14 +25,39 @@ class Parser:
 
     def declaration(self) -> stmt.Stmt:
         try:
-            if self.match(Token.TokenType.VAR):
+            if self.match(Token.TokenType.FUN):
+                return self.function("function")
+            elif self.match(Token.TokenType.VAR):
                 return self.var_declaration()
             else:
                 return self.statement()
         except ParseError:
             self.synchronize()
             return None
+    
+    def function(self, kind : str) -> stmt.Function:
+        name = self.consume(Token.TokenType.IDENTIFIER, f"Expect {kind} name.")
+        parameters = []
+
+        self.consume(Token.TokenType.LEFT_PAREN, f"Expect '(' after {kind} name.")
+
+        if not self.check(Token.TokenType.RIGHT_PAREN):
+            while True:
+                if len(parameters) >= 255:
+                    self.error(self.peek(), "Cannot have more than 255 parameters.")
+                
+                parameters.append(self.consume(Token.TokenType.IDENTIFIER, "Expect parameter name."))
+
+                if self.match(Token.TokenType.COMMA):
+                    break
         
+        self.consume(Token.TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
+
+        self.consume(Token.TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
+        body = self.block()
+
+        return stmt.Function(name, parameters, body)
+
     def var_declaration(self) -> stmt.Stmt:
         name = self.consume(Token.TokenType.IDENTIFIER, "Expect variable name.")
         
