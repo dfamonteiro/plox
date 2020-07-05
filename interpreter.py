@@ -1,4 +1,5 @@
 from typing import List
+from time import time
 
 import expr
 import Token
@@ -7,16 +8,27 @@ import stmt
 import environment
 import LoxCallable
 
+
 class RuntimeError(Exception):
     def __init__(self, token, message):
         super().__init__(message)
         self.token = token
 
 class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
+    _globals : environment.Environment
     env : environment.Environment
 
     def __init__(self):
         self.env = environment.Environment()
+        self._globals = self.env
+
+        clock = LoxCallable.LoxCallable()
+
+        clock.call = lambda self, interpreter, args: time()
+        clock.arity = lambda self: 0
+        clock.__str__ = lambda self: "<native fn>"
+
+        self._globals.define("clock", clock)
 
     def visit_block_stmt(self, statement : stmt.Block):
         self.execute_block(statement.statements, environment.Environment(self.env))
