@@ -31,6 +31,12 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
             value = self.evaluate(stmt.initializer)
 
             self.env.define(stmt.name.lexeme, value)
+    
+    def visit_assign_expr(self, expr):
+        value = self.evaluate(expr.value)
+
+        self.env.assign(expr.name, value)
+        return value
 
     def evaluate(self, expression : expr.Expr):
         return expression.accept(self)

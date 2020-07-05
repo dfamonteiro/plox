@@ -20,3 +20,13 @@ class Environment:
                 name, 
                 f"Undefined variable '{name.lexeme}'.'"
             )
+    
+    def assign(self, name : Token.Token, value : Any):
+        if name.lexeme in self.values:
+            self.values[name.lexeme] = value
+            return
+        else:
+            raise interpreter.RuntimeError(
+                name,
+                f"Undefined variable '{name.lexeme}'."
+            )
