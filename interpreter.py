@@ -13,6 +13,10 @@ class RuntimeError(Exception):
         super().__init__(message)
         self.token = token
 
+class Return(Exception):
+    def __init__(self, value):
+        self.value = value
+
 class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
     _globals : environment.Environment
     env : environment.Environment
@@ -156,6 +160,14 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
     def visit_function_stmt(self, stmt):
         function = LoxFunction.LoxFunction(stmt)
         self.env.define(stmt.name.lexeme, function)
+    
+    def visit_return_stmt(self, stmt):
+        value = None
+
+        if stmt.value != None:
+            value = self.evaluate(stmt.value)
+        
+        raise Return(value)
     
     def visit_call_expr(self, expr):
         callee = self.evaluate(expr.callee)

@@ -3,6 +3,7 @@ from typing import List, Any
 import LoxCallable
 import stmt
 import environment
+import interpreter as Interpreter
 
 class LoxFunction(LoxCallable.LoxCallable):
     declaration : stmt.Function
@@ -15,8 +16,10 @@ class LoxFunction(LoxCallable.LoxCallable):
 
         for i, param in enumerate(self.declaration.params):
             env.define(param.lexeme, arguments[i])
-        
-        interpreter.execute_block(self.declaration.body, env)
+        try:
+            interpreter.execute_block(self.declaration.body, env)
+        except Interpreter.Return as e:
+            return e.value
 
     def arity(self) -> int:
         return len(self.declaration.params)

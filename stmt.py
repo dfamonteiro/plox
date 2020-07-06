@@ -13,6 +13,8 @@ class StmtVisitor:
         raise NotImplementedError()
     def visit_if_stmt(self, stmt):
         raise NotImplementedError()
+    def visit_return_stmt(self, stmt):
+        raise NotImplementedError()
     def visit_print_stmt(self, stmt):
         raise NotImplementedError()
     def visit_var_stmt(self, stmt):
@@ -71,6 +73,18 @@ class If(Stmt):
 
     def accept(self, visitor : StmtVisitor):
         return visitor.visit_if_stmt(self)
+
+
+class Return(Stmt):
+    keyword : Token
+    value : Expr
+
+    def __init__(self, keyword : Token, value : Expr):
+        self.keyword = keyword
+        self.value = value
+
+    def accept(self, visitor : StmtVisitor):
+        return visitor.visit_return_stmt(self)
 
 
 class Print(Stmt):
