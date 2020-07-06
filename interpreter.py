@@ -7,8 +7,7 @@ import lox
 import stmt
 import environment
 import LoxCallable
-
-
+import LoxFunction
 class RuntimeError(Exception):
     def __init__(self, token, message):
         super().__init__(message)
@@ -154,6 +153,10 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         if _type == Token.TokenType.EQUAL_EQUAL:
             return self.is_equal(left, right)
     
+    def visit_function_stmt(self, stmt):
+        function = LoxFunction.LoxFunction(stmt)
+        self.env.define(stmt.name.lexeme, function)
+    
     def visit_call_expr(self, expr):
         callee = self.evaluate(expr.callee)
 
@@ -161,7 +164,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         for argument in expr.arguments:
             arguments.append(self.evaluate(argument))
 
-        if callee is not LoxCallable.LoxCallable:
+        if not isinstance(callee, LoxCallable.LoxCallable):
             raise RuntimeError(expr.paren, "Can only call functions and classes.")
         
         function : LoxCallable.LoxCallable = callee

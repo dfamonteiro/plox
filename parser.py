@@ -48,7 +48,7 @@ class Parser:
                 
                 parameters.append(self.consume(Token.TokenType.IDENTIFIER, "Expect parameter name."))
 
-                if self.match(Token.TokenType.COMMA):
+                if not self.match(Token.TokenType.COMMA):
                     break
         
         self.consume(Token.TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
