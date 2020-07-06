@@ -158,7 +158,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
             return self.is_equal(left, right)
     
     def visit_function_stmt(self, stmt):
-        function = LoxFunction.LoxFunction(stmt)
+        function = LoxFunction.LoxFunction(stmt, self.env)
         self.env.define(stmt.name.lexeme, function)
     
     def visit_return_stmt(self, stmt):

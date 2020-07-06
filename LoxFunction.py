@@ -7,12 +7,14 @@ import interpreter as Interpreter
 
 class LoxFunction(LoxCallable.LoxCallable):
     declaration : stmt.Function
+    closure : environment.Environment
 
-    def __init__(self, declaration : stmt.Function):
+    def __init__(self, declaration : stmt.Function, closure : environment.Environment):
         self.declaration = declaration
+        self.closure = closure
 
     def call(self, interpreter, arguments : List[Any]) -> Any:
-        env = environment.Environment(interpreter._globals)
+        env = environment.Environment(self.closure)
 
         for i, param in enumerate(self.declaration.params):
             env.define(param.lexeme, arguments[i])
