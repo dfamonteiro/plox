@@ -1,0 +1,135 @@
+from typing import List, Deque, Dict
+from collections import deque
+
+import expr
+import Token
+import lox
+import stmt
+import environment
+import LoxCallable
+import LoxFunction
+import interpreter as Interpreter
+
+class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
+    scopes : Deque[Dict[str, bool]]
+
+    def __init__(self, interpreter):
+        self.interpreter = interpreter
+        self.scopes = deque()
+    
+
+    def visit_block_stmt(self, statement : stmt.Block):
+        self.begin_scope()
+        self.resolve(statement.statements)
+        self.end_scope()
+    
+    def resolve(self, statements : List[stmt.Stmt]):
+        if isinstance(statements, stmt.Stmt):
+            statements.accept(self)
+        elif isinstance(statements, expr.Expr):
+            statements.accept(self)
+        else:
+            for statement in statements:
+                self.resolve(statement)
+    
+    def begin_scope(self):
+        self.scopes.append({})
+
+    def end_scope(self):
+        self.scopes.pop()
+    
+    def declare(self, name : Token.Token):
+        if len(self.scopes) == 0:
+            return
+        
+        self.scopes[-1][name.lexeme] = False
+    
+    def define(self, name : Token.Token):
+        if len(self.scopes) == 0:
+            return
+        
+        self.scopes[-1][name.lexeme] = True
+
+    def visit_logical_expr(self, expression : expr.Logical):
+        self.resolve(expression.left)
+        self.resolve(expression.right)
+    
+    def visit_while_stmt(self, stmt : stmt.While):
+        self.resolve(stmt.condition)
+        self.resolve(stmt.body)
+
+    
+    def visit_if_stmt(self, statement : stmt.If):
+        self.resolve(statement.condition)
+        self.resolve(statement.then_branch)
+
+        if statement.else_branch != None:
+            self.resolve(statement.else_branch)
+
+    def visit_expression_stmt(self, stmt):
+        self.resolve(stmt.expression)
+
+    def visit_print_stmt(self, stmt):
+        self.resolve(stmt.expression)
+    
+    def visit_var_stmt(self, stmt):
+        self.declare(stmt.name)
+        if stmt.initializer != None:
+            self.resolve(stmt.initializer)
+        self.define(stmt.name)
+    
+    def visit_assign_expr(self, expr):
+        self.resolve(expr.value)
+        self.resolve_local(expr, expr.name)        
+
+    def visit_binary_expr(self, expr : expr.Binary):
+        self.resolve(expr.left)
+        self.resolve(expr.right)
+    
+    def visit_function_stmt(self, stmt):
+        self.declare(stmt.name)
+        self.define(stmt.name)
+
+        self.resolve_function(stmt)
+    
+    def resolve_function(self, function):
+        self.begin_scope()
+
+        for param in function.params:
+            self.declare(param)
+            self.define(param)
+
+        self.resolve(function.body)
+        self.end_scope()
+
+    
+    def visit_return_stmt(self, stmt):
+        if stmt.value != None:
+            self.resolve(stmt.value)
+    
+    def visit_call_expr(self, expr):
+        self.resolve(expr.callee)
+
+        for argument in expr.arguments:
+            self.resolve(argument)
+
+    def visit_grouping_expr(self, expr : expr.Grouping):
+        self.resolve(expr.expression)
+
+    def visit_literal_expr(self, expr : expr.Literal):
+        pass
+
+    def visit_unary_expr(self, expr : expr.Unary):
+        self.resolve(expr.right)
+
+    def visit_variable_expr(self, expr):
+        if len(self.scopes) > 0 and self.scopes[-1][expr.name.lexeme] == False:
+            lox.error(expr.name, "Cannot read local variable in its own initializer.")
+        
+        self.resolve_local(expr, expr.name)
+    
+    def resolve_local(self, expr, name : Token.Token):
+        for i in range(len(self.scopes) - 1, -1, -1):
+            if name.lexeme in self.scopes[i]:
+                self.interpreter.resolve(expr, len(self.scopes) - 1 - i)
+                return
