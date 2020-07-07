@@ -36,7 +36,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         self._globals.define("clock", clock)
     
     def resolve(self, expr, depth):
-        self.locals[expr] = depth
+        self._locals[expr] = depth
 
     def visit_block_stmt(self, statement : stmt.Block):
         self.execute_block(statement.statements, environment.Environment(self.env))
@@ -92,7 +92,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
     def visit_assign_expr(self, expr):
         value = self.evaluate(expr.value)
 
-        distance = self._locals[expr]
+        distance = self._locals[expr] if expr in self._locals else None
 
         if distance != None:
             self.env.assign_at(distance, expr.name, value)
@@ -218,7 +218,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         return self.look_up_variable(expr.name, expr)
     
     def look_up_variable(self, name : Token.Token, expr):
-        distance = self._locals[expr]
+        distance = self._locals.get(expr, None)
         if distance != None:
             return self.env.get_at(distance, name.lexeme)
         else:

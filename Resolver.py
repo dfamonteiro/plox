@@ -136,7 +136,7 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         self.resolve(expr.right)
 
     def visit_variable_expr(self, expr):
-        if len(self.scopes) > 0 and self.scopes[-1][expr.name.lexeme] == False:
+        if len(self.scopes) > 0 and self.scopes[-1].get(expr.name.lexeme, None) == False:
             lox.error(expr.name, "Cannot read local variable in its own initializer.")
         
         self.resolve_local(expr, expr.name)
