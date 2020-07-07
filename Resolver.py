@@ -12,10 +12,12 @@ import interpreter as Interpreter
 
 class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
     scopes : Deque[Dict[str, bool]]
+    current_function : LoxFunction.FunctionType
 
     def __init__(self, interpreter):
         self.interpreter = interpreter
         self.scopes = deque()
+        self.current_function = LoxFunction.FunctionType.NONE
     
 
     def visit_block_stmt(self, statement : stmt.Block):
@@ -41,6 +43,9 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
     def declare(self, name : Token.Token):
         if len(self.scopes) == 0:
             return
+        
+        if name.lexeme in self.scopes[-1]:
+            lox.error(name, "Variable with this name already declared in this scope.")
         
         self.scopes[-1][name.lexeme] = False
     
@@ -90,9 +95,12 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         self.declare(stmt.name)
         self.define(stmt.name)
 
-        self.resolve_function(stmt)
+        self.resolve_function(stmt, LoxFunction.FunctionType.FUNCTION)
     
-    def resolve_function(self, function):
+    def resolve_function(self, function, function_type : LoxFunction.FunctionType):
+        enclosing_function = self.current_function
+        self.current_function = function_type
+
         self.begin_scope()
 
         for param in function.params:
@@ -102,8 +110,13 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         self.resolve(function.body)
         self.end_scope()
 
+        self.current_function = enclosing_function
+
     
     def visit_return_stmt(self, stmt):
+        if self.current_function == LoxFunction.FunctionType.NONE:
+            lox.error(stmt.keyword, "Cannot return from top-level code.")
+
         if stmt.value != None:
             self.resolve(stmt.value)
     
