@@ -9,6 +9,7 @@ import environment
 import LoxCallable
 import LoxFunction
 import LoxClass
+import LoxInstance
 class RuntimeError(Exception):
     def __init__(self, token, message):
         super().__init__(message)
@@ -79,6 +80,14 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         self.env.define(statement.name.lexeme, None)
         klass = LoxClass.LoxClass(statement.name.lexeme)
         self.env.assign(statement.name, klass)
+    
+    def visit_get_expr(self, expr):
+        objekt = self.evaluate(expr.object)
+
+        if isinstance(objekt, LoxInstance.LoxInstance):
+            return objekt.get(expr.name)
+        
+        raise RuntimeError(expr.name, "Only instances have properties.")
 
     def visit_expression_stmt(self, stmt):
         self.evaluate(stmt.expression)

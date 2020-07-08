@@ -10,6 +10,8 @@ class ExprVisitor:
         raise NotImplementedError()
     def visit_call_expr(self, expr):
         raise NotImplementedError()
+    def visit_get_expr(self, expr):
+        raise NotImplementedError()
     def visit_grouping_expr(self, expr):
         raise NotImplementedError()
     def visit_literal_expr(self, expr):
@@ -64,6 +66,18 @@ class Call(Expr):
 
     def accept(self, visitor : ExprVisitor):
         return visitor.visit_call_expr(self)
+
+
+class Get(Expr):
+    object : Expr
+    name : Token
+
+    def __init__(self, object : Expr, name : Token):
+        self.object = object
+        self.name = name
+
+    def accept(self, visitor : ExprVisitor):
+        return visitor.visit_get_expr(self)
 
 
 class Grouping(Expr):

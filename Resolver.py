@@ -129,6 +129,9 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
 
         for argument in expr.arguments:
             self.resolve(argument)
+    
+    def visit_get_expr(self, expr):
+        self.resolve(expr.object)
 
     def visit_grouping_expr(self, expr : expr.Grouping):
         self.resolve(expr.expression)
