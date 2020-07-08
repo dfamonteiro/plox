@@ -10,6 +10,7 @@ import interpreter as Interpreter
 class FunctionType(Enum):
     NONE     = auto()
     FUNCTION = auto()
+    METHOD   = auto()
 
 class LoxFunction(LoxCallable.LoxCallable):
     declaration : stmt.Function

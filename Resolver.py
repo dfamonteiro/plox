@@ -123,6 +123,10 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
     def visit_class_stmt(self, stmt):
         self.declare(stmt.name)
         self.define(stmt.name)
+
+        for method in stmt.methods:
+            declaration = LoxFunction.FunctionType.METHOD
+            self.resolve_function(method, declaration)
     
     def visit_set_expr(self, expr):
         self.resolve(expr.value)
