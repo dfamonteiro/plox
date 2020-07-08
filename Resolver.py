@@ -124,6 +124,9 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
             lox.error(stmt.keyword, "Cannot return from top-level code.")
 
         if stmt.value != None:
+            if self.current_function == LoxFunction.FunctionType.INITIALIZER:
+                lox.error(stmt.keyword, "Cannot return a value from an initializer.")
+
             self.resolve(stmt.value)
     
     def visit_class_stmt(self, stmt):
@@ -138,6 +141,10 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
 
         for method in stmt.methods:
             declaration = LoxFunction.FunctionType.METHOD
+            
+            if method.name.lexeme == "init":
+                declaration = LoxFunction.FunctionType.INITIALIZER
+
             self.resolve_function(method, declaration)
         
         self.end_scope()

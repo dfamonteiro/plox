@@ -82,7 +82,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         methods = {}
 
         for method in statement.methods:
-            function = LoxFunction.LoxFunction(method, self.env)
+            function = LoxFunction.LoxFunction(method, self.env, method.name.lexeme == "init")
             methods[method.name.lexeme] = function
 
         klass = LoxClass.LoxClass(statement.name.lexeme, methods)
@@ -205,7 +205,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
             return self.is_equal(left, right)
     
     def visit_function_stmt(self, stmt):
-        function = LoxFunction.LoxFunction(stmt, self.env)
+        function = LoxFunction.LoxFunction(stmt, self.env, False)
         self.env.define(stmt.name.lexeme, function)
     
     def visit_return_stmt(self, stmt):
