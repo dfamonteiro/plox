@@ -206,6 +206,9 @@ class Parser:
             if type(expression) == expr.Variable:
                 name = expression.name
                 return expr.Assign(name, value)
+            elif type(expression) == expr.Get:
+                get = expression
+                return expr.Set(get.objekt, get.name, value)
             else:
                 self.error(equals, "Invalid assignment target")
         

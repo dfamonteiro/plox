@@ -124,6 +124,10 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         self.declare(stmt.name)
         self.define(stmt.name)
     
+    def visit_set_expr(self, expr):
+        self.resolve(expr.value)
+        self.resolve(expr.object)
+    
     def visit_call_expr(self, expr):
         self.resolve(expr.callee)
 

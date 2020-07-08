@@ -18,6 +18,8 @@ class ExprVisitor:
         raise NotImplementedError()
     def visit_logical_expr(self, expr):
         raise NotImplementedError()
+    def visit_set_expr(self, expr):
+        raise NotImplementedError()
     def visit_unary_expr(self, expr):
         raise NotImplementedError()
     def visit_variable_expr(self, expr):
@@ -112,6 +114,20 @@ class Logical(Expr):
 
     def accept(self, visitor : ExprVisitor):
         return visitor.visit_logical_expr(self)
+
+
+class Set(Expr):
+    objekt : Expr
+    name : Token
+    value : Expr
+
+    def __init__(self, objekt : Expr, name : Token, value : Expr):
+        self.objekt = objekt
+        self.name = name
+        self.value = value
+
+    def accept(self, visitor : ExprVisitor):
+        return visitor.visit_set_expr(self)
 
 
 class Unary(Expr):
