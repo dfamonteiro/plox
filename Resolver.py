@@ -1,5 +1,6 @@
 from typing import List, Deque, Dict
 from collections import deque
+from enum import Enum, auto
 
 import expr
 import Token
@@ -10,15 +11,20 @@ import LoxCallable
 import LoxFunction
 import interpreter as Interpreter
 
+class ClassType(Enum):
+    NONE  = auto()
+    CLASS = auto()
+
 class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
     scopes : Deque[Dict[str, bool]]
     current_function : LoxFunction.FunctionType
+    current_class : ClassType
 
     def __init__(self, interpreter):
         self.interpreter = interpreter
         self.scopes = deque()
         self.current_function = LoxFunction.FunctionType.NONE
-    
+        self.current_class = ClassType.NONE
 
     def visit_block_stmt(self, statement : stmt.Block):
         self.begin_scope()
@@ -121,6 +127,9 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
             self.resolve(stmt.value)
     
     def visit_class_stmt(self, stmt):
+        enclosing_class = self.current_class
+        self.current_class = ClassType.CLASS
+
         self.declare(stmt.name)
         self.define(stmt.name)
 
@@ -132,8 +141,13 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
             self.resolve_function(method, declaration)
         
         self.end_scope()
-        
+
+        self.current_class = enclosing_class
+
     def visit_this_expr(self, expr):
+        if self.current_class == ClassType.NONE:
+            lox.error(expr.keyword, "Cannot use 'this' outside of a class.")
+            return
         self.resolve_local(expr, expr.keyword)
     
     def visit_set_expr(self, expr):
