@@ -29,6 +29,11 @@ class LoxFunction(LoxCallable.LoxCallable):
             interpreter.execute_block(self.declaration.body, env)
         except Interpreter.Return as e:
             return e.value
+    
+    def bind(self, instance):
+        env = environment.Environment(self.closure)
+        env.define("this", instance)
+        return LoxFunction(self.declaration, env)
 
     def arity(self) -> int:
         return len(self.declaration.params)

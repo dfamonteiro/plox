@@ -124,13 +124,21 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         self.declare(stmt.name)
         self.define(stmt.name)
 
+        self.begin_scope()
+        self.scopes[-1]["this"] = True
+
         for method in stmt.methods:
             declaration = LoxFunction.FunctionType.METHOD
             self.resolve_function(method, declaration)
+        
+        self.end_scope()
+        
+    def visit_this_expr(self, expr):
+        self.resolve_local(expr, expr.keyword)
     
     def visit_set_expr(self, expr):
         self.resolve(expr.value)
-        self.resolve(expr.object)
+        self.resolve(expr._object)
     
     def visit_call_expr(self, expr):
         self.resolve(expr.callee)
@@ -139,7 +147,7 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
             self.resolve(argument)
     
     def visit_get_expr(self, expr):
-        self.resolve(expr.object)
+        self.resolve(expr._object)
 
     def visit_grouping_expr(self, expr : expr.Grouping):
         self.resolve(expr.expression)

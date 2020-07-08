@@ -90,15 +90,18 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
         self.env.assign(statement.name, klass)
     
     def visit_get_expr(self, expr):
-        objekt = self.evaluate(expr.object)
+        objekt = self.evaluate(expr._object)
 
         if isinstance(objekt, LoxInstance.LoxInstance):
             return objekt.get(expr.name)
         
         raise RuntimeError(expr.name, "Only instances have properties.")
 
+    def visit_this_expr(self, expr):
+        return self.look_up_variable(expr.keyword, expr)
+
     def visit_set_expr(self, expr):
-        objekt = self.evaluate(expr.object)
+        objekt = self.evaluate(expr._object)
 
         if not isinstance(objekt, LoxInstance.LoxInstance):
             raise RuntimeError(expr.name, "Only instances have fields.")

@@ -208,7 +208,7 @@ class Parser:
                 return expr.Assign(name, value)
             elif type(expression) == expr.Get:
                 get = expression
-                return expr.Set(get.objekt, get.name, value)
+                return expr.Set(get._object, get.name, value)
             else:
                 self.error(equals, "Invalid assignment target")
         
@@ -355,6 +355,9 @@ class Parser:
         if self.match(Token.TokenType.NUMBER, Token.TokenType.STRING):
             return expr.Literal(self.previous().literal)
         
+        if self.match(Token.TokenType.THIS):
+            return expr.This(self.previous())
+
         if (self.match(Token.TokenType.IDENTIFIER)):
             return expr.Variable(self.previous())
         
