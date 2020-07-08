@@ -8,6 +8,7 @@ import stmt
 import environment
 import LoxCallable
 import LoxFunction
+import LoxClass
 class RuntimeError(Exception):
     def __init__(self, token, message):
         super().__init__(message)
@@ -73,6 +74,11 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
             self.execute(statement.then_branch)
         elif statement.else_branch != None:
             self.execute(statement.else_branch)
+
+    def visit_class_stmt(self, statement : stmt.Class):
+        self.env.define(statement.name.lexeme, None)
+        klass = LoxClass.LoxClass(statement.name.lexeme)
+        self.env.assign(statement.name, klass)
 
     def visit_expression_stmt(self, stmt):
         self.evaluate(stmt.expression)

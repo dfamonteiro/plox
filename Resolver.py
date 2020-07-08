@@ -120,6 +120,10 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         if stmt.value != None:
             self.resolve(stmt.value)
     
+    def visit_class_stmt(self, stmt):
+        self.declare(stmt.name)
+        self.define(stmt.name)
+    
     def visit_call_expr(self, expr):
         self.resolve(expr.callee)
 

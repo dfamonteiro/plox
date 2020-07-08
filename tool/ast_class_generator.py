@@ -106,6 +106,7 @@ if __name__ == "__main__":
     defineAst(".", "Stmt",
         [
             "Block      : List[Stmt] statements",
+            "Class      : Token name, List[Stmt.Function] methods",
             "Expression : Expr expression",
             "Function   : Token name, List[Token] params, List[Stmt] body",
             "If         : Expr condition, Stmt then_branch, Stmt else_branch",
