@@ -12,8 +12,9 @@ import LoxFunction
 import interpreter as Interpreter
 
 class ClassType(Enum):
-    NONE  = auto()
-    CLASS = auto()
+    NONE     = auto()
+    CLASS    = auto()
+    SUBCLASS = auto()
 
 class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
     scopes : Deque[Dict[str, bool]]
@@ -140,6 +141,7 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
             lox.error(stmt.superclass.name, "A class cannot inherit from itself.")
 
         if stmt.superclass != None:
+            self.current_class = ClassType.SUBCLASS
             self.resolve(stmt.superclass)
 
         
@@ -177,6 +179,12 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
 
     
     def visit_super_expr(self, expr):
+
+        if self.current_class == ClassType.NONE:
+            lox.error(expr.keyword, "Cannot use 'super' outside of a class.")
+        elif self.current_class == ClassType.SUBCLASS:
+            lox.error(expr.keyword, "Cannot use 'super' in a class with no superclass.")
+        
         self.resolve_local(expr, expr.keyword)
     
     def visit_call_expr(self, expr):
