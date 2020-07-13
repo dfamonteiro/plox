@@ -142,6 +142,11 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         if stmt.superclass != None:
             self.resolve(stmt.superclass)
 
+        
+        if stmt.superclass != None:
+            self.begin_scope()
+            self.scopes[-1]["super"] = True
+
         self.begin_scope()
         self.scopes[-1]["this"] = True
 
@@ -155,6 +160,9 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
         
         self.end_scope()
 
+        if stmt.superclass != None:
+            self.end_scope()
+
         self.current_class = enclosing_class
 
     def visit_this_expr(self, expr):
@@ -166,6 +174,10 @@ class Resolver(expr.ExprVisitor, stmt.StmtVisitor):
     def visit_set_expr(self, expr):
         self.resolve(expr.value)
         self.resolve(expr._object)
+
+    
+    def visit_super_expr(self, expr):
+        self.resolve_local(expr, expr.keyword)
     
     def visit_call_expr(self, expr):
         self.resolve(expr.callee)
