@@ -2,9 +2,9 @@ from typing import List, Any
 from enum import Enum, auto
 
 import LoxCallable
-import stmt
-import environment
-import interpreter as Interpreter
+import Stmt
+import Environment
+import Interpreter
 
 
 class FunctionType(Enum):
@@ -14,17 +14,17 @@ class FunctionType(Enum):
     METHOD      = auto()
 
 class LoxFunction(LoxCallable.LoxCallable):
-    declaration : stmt.Function
-    closure : environment.Environment
+    declaration : Stmt.Function
+    closure : Environment.Environment
     is_initializer : bool
 
-    def __init__(self, declaration : stmt.Function, closure : environment.Environment, is_initializer : bool):
+    def __init__(self, declaration : Stmt.Function, closure : Environment.Environment, is_initializer : bool):
         self.declaration = declaration
         self.closure = closure
         self.is_initializer = is_initializer
 
     def call(self, interpreter, arguments : List[Any]) -> Any:
-        env = environment.Environment(self.closure)
+        env = Environment.Environment(self.closure)
 
         for i, param in enumerate(self.declaration.params):
             env.define(param.lexeme, arguments[i])
@@ -39,7 +39,7 @@ class LoxFunction(LoxCallable.LoxCallable):
             return self.closure.get_at(0, "this")
     
     def bind(self, instance):
-        env = environment.Environment(self.closure)
+        env = Environment.Environment(self.closure)
         env.define("this", instance)
         return LoxFunction(self.declaration, env, self.is_initializer)
 

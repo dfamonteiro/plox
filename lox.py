@@ -1,36 +1,32 @@
 from typing import Union
 
 import Token
-import scanner as scan
-import parser
-import ast_printer
-import interpreter
+import Scanner
+import Parser
+import Interpreter
 import Resolver
 
 had_error : bool = False
 had_runtime_error : bool = False
-interprter = interpreter.Interpreter() # The typo is intentional
+interpreter = Interpreter.Interpreter() # The typo is intentional
 
 def run(source : str) -> None:
-    scanner = scan.Scanner(source)
+    scanner = Scanner.Scanner(source)
     tokens = scanner.scan_tokens()
 
-    _parser = parser.Parser(tokens)
+    _parser = Parser.Parser(tokens)
     statements = _parser.parse()
 
     if had_error:
         return
 
-    resolver = Resolver.Resolver(interprter)
+    resolver = Resolver.Resolver(interpreter)
     resolver.resolve(statements)
 
     if had_error:
         return
 
-    #print(ast_printer.AstPrinter().print_ast(expression))
-    interprter.interpret(statements)
-    # for token in tokens:
-    #     print(token)
+    interpreter.interpret(statements)
 
 def run_file(path : str) -> None:
     global had_error 
@@ -72,7 +68,7 @@ def error(line : Union[int, Token.Token], message : str) -> None:
         else:
             report(_token.line, f" at '{_token.lexeme}'", message)
 
-def runtime_error(e : interpreter.RuntimeError):
+def runtime_error(e : Interpreter.RuntimeError):
     global had_runtime_error
     print(f"{str(e)}\n[line{e.token.line}]")
     had_runtime_error = True

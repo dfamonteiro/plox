@@ -1,7 +1,7 @@
 from typing import Dict, Any, Union
 
 import Token
-import interpreter
+import Interpreter
 
 class Environment:
     values : Dict[str, Any]
@@ -20,7 +20,7 @@ class Environment:
         if self.enclosing != None:
             return self.enclosing.get(name)
 
-        raise interpreter.RuntimeError(
+        raise Interpreter.RuntimeError(
             name, 
             f"Undefined variable '{name.lexeme}'.'"
         )
@@ -34,7 +34,7 @@ class Environment:
             self.enclosing.assign(name, value)
             return
 
-        raise interpreter.RuntimeError(
+        raise Interpreter.RuntimeError(
             name,
             f"Undefined variable '{name.lexeme}'."
         )

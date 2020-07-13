@@ -1,7 +1,7 @@
 from typing import Dict, Any
 
 import Token
-import interpreter as Interpreter
+import Interpreter
 class LoxInstance:
     fields : Dict[str, Any]
 

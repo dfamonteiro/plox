@@ -1,17 +1,17 @@
-import expr
+import Expr
 import Token
 
-class AstPrinter(expr.ExprVisitor):
-    def print_ast(self, expression : expr.Expr):
+class AstPrinter(Expr.ExprVisitor):
+    def print_ast(self, expression : Expr.Expr):
         return expression.accept(self)
     
-    def visit_binary_expr(self, expr : expr.Binary):
+    def visit_binary_expr(self, expr : Expr.Binary):
         return self.parenthesize(expr.operator.lexeme, expr.left, expr.right)
-    def visit_grouping_expr(self, expr : expr.Grouping):
+    def visit_grouping_expr(self, expr : Expr.Grouping):
         return self.parenthesize("group", expr.expression)
-    def visit_literal_expr(self, expr : expr.Literal):
+    def visit_literal_expr(self, expr : Expr.Literal):
         return str(expr.value) if expr.value != None else "nil"
-    def visit_unary_expr(self, expr : expr.Unary):
+    def visit_unary_expr(self, expr : Expr.Unary):
         return self.parenthesize(expr.operator.lexeme, expr.right)
 
     def parenthesize(self, name : str, *expressions):
@@ -25,14 +25,14 @@ class AstPrinter(expr.ExprVisitor):
         return res
     
 if __name__ == "__main__":
-    expression = expr.Binary(
-        expr.Unary(
+    expression = Expr.Binary(
+        Expr.Unary(
             Token.Token(Token.TokenType.MINUS, "-", None, 1),
-            expr.Literal(123)
+            Expr.Literal(123)
         ),
         Token.Token(Token.TokenType.STAR, "*", None, 1),
-        expr.Grouping(
-            expr.Literal(45.67)
+        Expr.Grouping(
+            Expr.Literal(45.67)
         )
     )
 
