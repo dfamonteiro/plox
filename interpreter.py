@@ -77,6 +77,12 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
             self.execute(statement.else_branch)
 
     def visit_class_stmt(self, statement : stmt.Class):
+        superclass = None
+        if statement.superclass != None:
+            superclass = self.evaluate(statement.superclass)
+            if not isinstance(superclass, LoxClass.LoxClass):
+                raise RuntimeError(statement.superclass.name, "Superclass must be a class.")
+
         self.env.define(statement.name.lexeme, None)
 
         methods = {}
@@ -85,7 +91,7 @@ class Interpreter(expr.ExprVisitor, stmt.StmtVisitor):
             function = LoxFunction.LoxFunction(method, self.env, method.name.lexeme == "init")
             methods[method.name.lexeme] = function
 
-        klass = LoxClass.LoxClass(statement.name.lexeme, methods)
+        klass = LoxClass.LoxClass(statement.name.lexeme, superclass, methods)
         
         self.env.assign(statement.name, klass)
     
