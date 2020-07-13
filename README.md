@@ -1,2 +1,2 @@
-# plox
-A Python implementation of the lox language
+# plox: A Python implementation of the jlox interpreter
+
